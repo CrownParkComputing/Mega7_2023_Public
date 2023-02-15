@@ -14,8 +14,8 @@ namespace Mega7_2023
 {
     public class ViewModel : NotificationObject
     {
-        MegaApiClient client = new();
-        Uri folderLink = new("https://mega.nz/folder/gdozjZxL#uI5SheetsAd-NYKMeRjf2A");
+        readonly MegaApiClient client = new();
+        readonly Uri folderLink = new("https://mega.nz/folder/gdozjZxL#uI5SheetsAd-NYKMeRjf2A");
         IEnumerable<CG.Web.MegaApiClient.INode> nodes;
 
 
@@ -75,20 +75,22 @@ namespace Mega7_2023
         public void ChangeCanExecute(object obj)
         {
             var rowdataContent = (obj as Node);
+            
+            if (rowdataContent != null)
+            {
 
-            if (rowdataContent.Type == NodeType.File)
-            {
-                DownloadFile(rowdataContent.NodeId);
-                MessageBox.Show("Finished Downloading File");
-            }
-            else
-            {
-                DownloadFolder(rowdataContent);
-                MessageBox.Show("Finished Downloading Folder");
+                if (rowdataContent.Type == NodeType.File)
+                {
+                    _ = Task.Run(async () => { await DownloadFile(rowdataContent.NodeId); }).ContinueWith((result) => { MessageBox.Show("Finished Downloading File" + rowdataContent.Name); });
+                }
+                else
+                {
+                    _ = Task.Run(async () => { await DownloadFolder(rowdataContent); }).ContinueWith((result) => { MessageBox.Show("Finished Downloading Folder " + rowdataContent.Name); });
+                }
             }
         }
 
-        List<string> GetParents(INode node, IEnumerable<INode> nodes)
+        static List<string> GetParents(INode node, IEnumerable<INode> nodes)
         {
             List<string> parents = new();
 
@@ -108,8 +110,8 @@ namespace Mega7_2023
         {
             ObservableCollection<Node> _nodesCollection = new();
             {
-                client.LoginAnonymous();
-                //client.Login("username@domain.com", "passw0rd");
+                //client.LoginAnonymous();
+                client.Login("whittythedaddy@gmail.com", "simpsons2K5#");
             }
 
             nodes = client.GetNodesFromLink(folderLink);
@@ -117,7 +119,7 @@ namespace Mega7_2023
             CG.Web.MegaApiClient.INode root;
             root = nodes.Single(n => n.Type == NodeType.Root);
 
-            Node rootNode = new Node() { NodeId = root.Id, Type = root.Type, Name = root.Name, Size = root.Size, CreationDate = (DateTime)root.CreationDate };
+            Node rootNode = new() { NodeId = root.Id, Type = root.Type, Name = root.Name, Size = root.Size, CreationDate = (DateTime)root.CreationDate };
 
             GetNodesRecursive(rootNode, nodes, root);
             _nodesCollection.Add(rootNode);
@@ -127,7 +129,7 @@ namespace Mega7_2023
 
 
 
-        public void DownloadFile(string nodeId)
+        public async Task DownloadFile(string nodeId)
         {
             CG.Web.MegaApiClient.INode node = nodes.Single(x => x.Id == nodeId);
 
@@ -148,7 +150,7 @@ namespace Mega7_2023
             if (!client.IsLoggedIn)
             { client.LoginAnonymous(); }
 
-            client.DownloadFile(node, fileToSave, null);
+            await client.DownloadFileAsync(node, fileToSave, null);
             if ((DateTime?)node.CreationDate != null)
             {
                 File.SetCreationTime(fileToSave, (DateTime)node.CreationDate);
@@ -156,46 +158,49 @@ namespace Mega7_2023
             }
         }
 
-        public void DownloadFolder(Node folderNode)   // need to upgrade this to task / async download 
+        public async Task DownloadFolder(Node folderNode)   // need to upgrade this to task / async download 
         {
             if (!client.IsLoggedIn)
             {
-                client.LoginAnonymous();
-                //client.Login("username@domain.com", "passw0rd");
+                //client.LoginAnonymous();
+                client.Login("whittythedaddy@gmail.com", "simpsons2K5#");
             }
 
-            foreach (Node temp in folderNode.Items)
+            if (folderNode.Items != null)
             {
-                if (temp.Type == NodeType.File)
+                foreach (Node temp in folderNode.Items)
                 {
-
-                    CG.Web.MegaApiClient.INode node = nodes.Single(x => x.Id == temp.NodeId);
-
-                    List<string> parents = GetParents(node, nodes);
-                    string tempFolder = string.Join('\\', parents);
-
-                    Directory.CreateDirectory(tempFolder);
-
-                    string fileToSave = Path.Combine(tempFolder, node.Name);
-
-                    if (File.Exists(fileToSave))
+                    if (temp.Type == NodeType.File)
                     {
-                        File.Delete(fileToSave);
-                    }
-                    client.DownloadFile(node, fileToSave, null);
 
-                    if ((DateTime?)node.CreationDate != null)
+                        CG.Web.MegaApiClient.INode node = nodes.Single(x => x.Id == temp.NodeId);
+
+                        List<string> parents = GetParents(node, nodes);
+                        string tempFolder = string.Join('\\', parents);
+
+                        Directory.CreateDirectory(tempFolder);
+
+                        string fileToSave = Path.Combine(tempFolder, node.Name);
+
+                        if (File.Exists(fileToSave))
+                        {
+                            File.Delete(fileToSave);
+                        }
+                        await client.DownloadFileAsync(node, fileToSave, null);
+
+                        if ((DateTime?)node.CreationDate != null)
+                        {
+                            File.SetCreationTime(fileToSave, (DateTime)node.CreationDate);
+                            File.SetLastWriteTime(fileToSave, (DateTime)node.CreationDate);
+                        }
+                    }
+
+                    if (temp.Type == NodeType.Directory)
                     {
-                        File.SetCreationTime(fileToSave, (DateTime)node.CreationDate);
-                        File.SetLastWriteTime(fileToSave, (DateTime)node.CreationDate);
+                        _ = Task.Run(async () => { await DownloadFolder(temp); }).ContinueWith((result) => { MessageBox.Show(("Finished Downloading Folder ") + temp.Name); });
                     }
-                }
 
-                if (temp.Type == NodeType.Directory)
-                {
-                    DownloadFolder(temp);
                 }
-
             }
         }
 
