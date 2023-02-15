@@ -16,20 +16,31 @@
     <Grid x:Name="Root_Grid">
 
         <syncfusion:SfTreeGrid Name="treeGrid"
-                               AllowFiltering="True"
                                AutoExpandMode="RootNodesExpanded"
-                               AutoGenerateColumns="true" 
-                               NavigationMode="Row"
-                               EnableRecursiveChecking="True"
-                               ShowCheckBox="True"
-                               CheckBoxSelectionMode="SynchronizeSelection"
-                               ColumnSizer="Auto"
+                               Grid.Row="1"  
+                               ShowRowHeader="True" 
+                               AutoGenerateColumns="False"
                                ChildPropertyName="Items"
                                SelectionMode="Extended"
+                               SelectedItem="{Binding SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                SelectionBackground="SkyBlue"                                                    
                                SelectionForeground="DarkBlue"
-                               ItemsSource="{Binding Nodes}" />
+                               ItemsSource="{Binding Nodes}">
+            <syncfusion:SfTreeGrid.Columns>
+                <syncfusion:TreeGridTextColumn MappingName="Name"/>
+                <syncfusion:TreeGridTextColumn MappingName="Size"/>
+                <syncfusion:TreeGridTextColumn MappingName="CreationDate"/>
+                <syncfusion:TreeGridTextColumn MappingName="Type"/>
+                <syncfusion:TreeGridTemplateColumn MappingName="NodeId" syncfusion:FocusManagerHelper.WantsKeyInput="True">
+                    <syncfusion:TreeGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button  Content="Download" syncfusion:FocusManagerHelper.FocusedElement="True" 
+                                     Command="{Binding Path=DataContext.RowDataCommand,ElementName=treeGrid}" CommandParameter="{Binding}"/>
+                        </DataTemplate>
+                    </syncfusion:TreeGridTemplateColumn.CellTemplate>
+                </syncfusion:TreeGridTemplateColumn>
+            </syncfusion:SfTreeGrid.Columns>
 
-
+        </syncfusion:SfTreeGrid>
     </Grid>
 </Window>

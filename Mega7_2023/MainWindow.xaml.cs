@@ -1,5 +1,4 @@
-﻿using Syncfusion.Windows.Shared;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,14 +12,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Syncfusion.UI.Xaml.TreeGrid;
-using Syncfusion.UI.Xaml.TreeGrid.Helpers;
 
 
 namespace Mega7_2023
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for MainWindow.xaml   
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -28,5 +25,10 @@ namespace Mega7_2023
         {
             InitializeComponent();
         }
+
+        private void TreeGrid_SelectionChanged(object sender, Syncfusion.UI.Xaml.Grid.GridSelectionChangedEventArgs e)
+        {
+         
+        }
     }
-}
+} 
