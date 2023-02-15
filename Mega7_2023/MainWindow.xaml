@@ -6,16 +6,16 @@
         xmlns:local="clr-namespace:Mega7_2023"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="900">
+        Title="MainWindow" Height="600" Width="1100">
     
     <Window.DataContext>
         <local:ViewModel/>
     </Window.DataContext>
    
     
-    <Grid x:Name="Root_Grid">
+    <Grid x:Name="Root_Grid" Margin="10,5,10,5" HorizontalAlignment="Left">
 
-        <syncfusion:SfTreeGrid Name="treeGrid"
+        <syncfusion:SfTreeGrid Name="EAB_Stash"
                                AutoExpandMode="RootNodesExpanded"
                                Grid.Row="1"  
                                ShowRowHeader="True" 
@@ -25,17 +25,17 @@
                                SelectedItem="{Binding SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                SelectionBackground="SkyBlue"                                                    
                                SelectionForeground="DarkBlue"
-                               ItemsSource="{Binding Nodes}">
+                               ItemsSource="{Binding Nodes}" AllowFiltering="True" ShowCheckBox="True" CheckBoxSelectionMode="SynchronizeSelection" FilterLevel="Extended">
             <syncfusion:SfTreeGrid.Columns>
-                <syncfusion:TreeGridTextColumn MappingName="Name"/>
-                <syncfusion:TreeGridTextColumn MappingName="Size"/>
-                <syncfusion:TreeGridTextColumn MappingName="CreationDate"/>
-                <syncfusion:TreeGridTextColumn MappingName="Type"/>
-                <syncfusion:TreeGridTemplateColumn MappingName="NodeId" syncfusion:FocusManagerHelper.WantsKeyInput="True">
+                <syncfusion:TreeGridTextColumn Width ="340" MappingName="Name"/>
+                <syncfusion:TreeGridTextColumn Width ="100" MappingName="Size"/>
+                <syncfusion:TreeGridTextColumn Width ="150" MappingName="CreationDate"/>
+                <syncfusion:TreeGridTextColumn Width ="100" MappingName="Type"/>
+                <syncfusion:TreeGridTemplateColumn Width ="100" MappingName="NodeId" syncfusion:FocusManagerHelper.WantsKeyInput="True">
                     <syncfusion:TreeGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button  Content="Download" syncfusion:FocusManagerHelper.FocusedElement="True" 
-                                     Command="{Binding Path=DataContext.RowDataCommand,ElementName=treeGrid}" CommandParameter="{Binding}"/>
+                                     Command="{Binding Path=DataContext.RowDataCommand,ElementName=EAB_Stash}" CommandParameter="{Binding}"/>
                         </DataTemplate>
                     </syncfusion:TreeGridTemplateColumn.CellTemplate>
                 </syncfusion:TreeGridTemplateColumn>
